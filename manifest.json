@@ -1,0 +1,18 @@
+{
+    "manifest_version": 3,
+    "name": "Salah Time",
+    "version": "1.0",
+    "description": "Displays Muslim prayer (Salah) times",
+    "permissions": ["geolocation"],
+    "action": {
+      "default_popup": "src/html/popup.html",
+      "default_icon": {
+        "16": "icons/icons8-mosque-flat-16.png",
+        "32": "icons/icons8-mosque-flat-32.png"
+      }
+    },
+    "icons": {
+      "16": "icons/icons8-mosque-flat-16.png",
+      "32": "icons/icons8-mosque-flat-32.png"
+    }
+  }

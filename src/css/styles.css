@@ -1,0 +1,42 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    width: 350px;
+    padding: 20px;
+    background-color: #f0f8ff;
+    color: #333;
+  }
+  h1 {
+    text-align: center;
+    color: #2c3e50;
+  }
+  #location {
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 20px;
+    width: 100%;
+    height: 30px;
+  }
+  .prayer-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+  .prayer-card:hover {
+    transform: translateY(-5px);
+  }
+  .prayer-name {
+    font-weight: 700;
+    color: #3498db;
+    margin-bottom: 10px;
+  }
+  .prayer-time {
+    display: flex;
+    justify-content: space-between;
+  }
+  .current-prayer {
+    background-color: #e6f7ff;
+    border: 2px solid #3498db;
+  }
