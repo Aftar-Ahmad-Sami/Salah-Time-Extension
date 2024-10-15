@@ -1,6 +1,6 @@
 # Salah Times Extension
 
-![Extension Icon](icons\icons8-mosque-flat-96.png)
+![Extension Icon](https://raw.githubusercontent.com/Aftar-Ahmad-Sami/Salah-Time-Extension/refs/heads/main/icons/icons8-mosque-flat-96.png)
 
 ## Overview
 
