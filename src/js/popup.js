@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <div class="prayer-card" id="${prayer.toLowerCase()}-card">
                 <div class="prayer-name">${prayer}</div>
                 <div class="prayer-time">
-                  <span><b>Starts:&nbsp;</b>${startTime}</span>
+                  <span><b>Starts:</b>\t${startTime}</span>
                 </div>
               </div>
             `;

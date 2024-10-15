@@ -23,6 +23,11 @@ body {
     margin-bottom: 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-size: larger;
   }
   .prayer-card:hover {
     transform: translateY(-5px);
@@ -30,7 +35,6 @@ body {
   .prayer-name {
     font-weight: 700;
     color: #3498db;
-    margin-bottom: 10px;
   }
   .prayer-time {
     display: flex;
