@@ -1,56 +1,29 @@
-// Event listener for when the DOM is loaded
+// Event listener for when the DOM content is loaded
 document.addEventListener('DOMContentLoaded', function() {
   if (navigator.geolocation) {
-    // Get the current position
+    // Get the current position of the user
     navigator.geolocation.getCurrentPosition(function(position) {
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
+      const lat = Number(position.coords.latitude);
+      const lon = Number(position.coords.longitude);
       const date = new Date();
-      
+
       // Fetch location name using reverse geocoding
       fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10`)
         .then(response => response.json())
         .then(data => {
           const locationName = data.display_name;
+          const cityName = data.address.city || data.name || '';
+          const countryCode = data.address.country_code ? data.address.country_code.toUpperCase() : '';
           document.getElementById('location').innerHTML = `<p>${locationName}</p>`;
+
+          // Now that we have the city and country, fetch prayer times
+          fetchPrayerTimes(date, cityName, countryCode);
         })
         .catch(error => {
           console.error('Error fetching location:', error);
           document.getElementById('location').innerHTML = '<p>Unable to fetch location</p>';
-        });
-
-      // Fetch prayer times
-      fetch(`https://api.aladhan.com/v1/timings/${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}?latitude=${lat}&longitude=${lon}&method=2&school=1&midnightMode=1&timezonestring=auto`)
-        .then(response => response.json())
-        .then(data => {
-          const timings = data.data.timings;
-          const prayerOrder = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-          const prayerTimesDiv = document.getElementById('prayerTimes');
-          let prayerTimesHTML = '';
-
-          // Generate HTML for each prayer time
-          prayerOrder.forEach((prayer) => {
-            const startTime = convertTo12Hour(timings[prayer]);
-
-            prayerTimesHTML += `
-              <div class="prayer-card" id="${prayer.toLowerCase()}-card">
-                <div class="prayer-name">${prayer}</div>
-                <div class="prayer-time">
-                  <span><b>Starts:</b>\t${startTime}</span>
-                </div>
-              </div>
-            `;
-          });
-
-          // Set the generated HTML for prayer times
-          prayerTimesDiv.innerHTML = prayerTimesHTML;
-
-          // Highlight the current prayer time
-          highlightCurrentPrayer(timings);
-        })
-        .catch(error => {
-          console.error('Error fetching prayer times:', error);
-          document.getElementById('prayerTimes').innerHTML = '<p>Unable to fetch prayer times</p>';
+          // If location fetch fails, try to fetch prayer times with coordinates
+          fetchPrayerTimesWithCoordinates(date, lat, lon);
         });
     }, function(error) {
       console.error('Error getting location:', error);
@@ -61,6 +34,60 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('location').innerHTML = '<p>Geolocation not supported</p>';
   }
 });
+
+// Function to fetch prayer times by city and country
+function fetchPrayerTimes(date, cityName, countryCode) {
+  const prayer_url = `https://api.aladhan.com/v1/timingsByCity/${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}?city=${cityName}&country=${countryCode}&method=2&school=1&midnightMode=0&timezonestring=auto`;
+
+  fetch(prayer_url)
+    .then(response => response.json())
+    .then(data => {
+      displayPrayerTimes(data.data.timings);
+    })
+    .catch(error => {
+      console.error('Error fetching prayer times:', error);
+      document.getElementById('prayerTimes').innerHTML = '<p>Unable to fetch prayer times</p>';
+    });
+}
+
+// Function to fetch prayer times by coordinates
+function fetchPrayerTimesWithCoordinates(date, lat, lon) {
+  const prayer_url = `https://api.aladhan.com/v1/timings/${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}?latitude=${lat}&longitude=${lon}&method=2&school=1&midnightMode=0&timezonestring=auto`;
+
+  fetch(prayer_url)
+    .then(response => response.json())
+    .then(data => {
+      displayPrayerTimes(data.data.timings);
+    })
+    .catch(error => {
+      console.error('Error fetching prayer times:', error);
+      document.getElementById('prayerTimes').innerHTML = '<p>Unable to fetch prayer times</p>';
+    });
+}
+
+// Function to display prayer times
+function displayPrayerTimes(timings) {
+  const prayerOrder = ['Fajr', 'Sunrise','Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+  const prayerTimesDiv = document.getElementById('prayerTimes');
+  let prayerTimesHTML = '';
+
+  // Iterate through each prayer and create HTML elements
+  prayerOrder.forEach((prayer) => {
+    const startTime = convertTo12Hour(timings[prayer]);
+    prayerTimesHTML += `
+      <div class="prayer-card" id="${prayer.toLowerCase()}-card">
+        <div class="prayer-name">${prayer}</div>
+        <div class="prayer-time">
+          <span><b>Starts:</b>\t${startTime}</span>
+        </div>
+      </div>
+    `;
+  });
+
+  // Set the HTML content of the prayer times div
+  prayerTimesDiv.innerHTML = prayerTimesHTML;
+  highlightCurrentPrayer(timings);
+}
 
 /**
  * Converts a 24-hour time format to a 12-hour time format.
@@ -93,7 +120,7 @@ function highlightCurrentPrayer(timings) {
   const now = new Date();
   const currentTime = now.getHours() * 60 + now.getMinutes();
 
-  const prayerOrder = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+  const prayerOrder = ['Fajr', 'Sunrise','Dhuhr', 'Asr', 'Maghrib', 'Isha'];
   let currentPrayer = prayerOrder[prayerOrder.length - 1];
 
   // Find the current prayer based on the current time
