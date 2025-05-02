@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to fetch prayer times by city and country
 function fetchPrayerTimes(date, cityName, countryCode) {
-  const prayer_url = `https://api.aladhan.com/v1/timingsByCity/${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}?city=${cityName}&country=${countryCode}&method=2&school=1&midnightMode=0&timezonestring=auto`;
+  const prayer_url = `https://api.aladhan.com/v1/timingsByCity/${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}?city=${cityName}&country=${countryCode}&school=1`;
 
   fetch(prayer_url)
     .then(response => response.json())
@@ -52,7 +52,7 @@ function fetchPrayerTimes(date, cityName, countryCode) {
 
 // Function to fetch prayer times by coordinates
 function fetchPrayerTimesWithCoordinates(date, lat, lon) {
-  const prayer_url = `https://api.aladhan.com/v1/timings/${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}?latitude=${lat}&longitude=${lon}&method=2&school=1&midnightMode=0&timezonestring=auto`;
+  const prayer_url = `https://api.aladhan.com/v1/timings/${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}?latitude=${lat}&longitude=${lon}&school=1`;
 
   fetch(prayer_url)
     .then(response => response.json())
