@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Salah Time",
-    "version": "1.0",
+    "version": "1.0.0",
     "description": "Displays Muslim prayer (Salah) times",
     "permissions": ["geolocation"],
     "action": {
