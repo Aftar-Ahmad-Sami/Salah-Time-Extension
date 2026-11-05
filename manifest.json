@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
     "name": "Salah Time",
-    "version": "1.0.0",
-    "description": "Displays Muslim prayer (Salah) times",
+    "version": "1.1.0",
+    "description": "Muslim prayer (Salah) times with a live countdown, Hijri date and Qibla direction",
     "permissions": ["geolocation"],
     "browser_specific_settings": {
       "gecko": {

@@ -8,10 +8,15 @@ The **Salah Times Extension** is a simple yet powerful tool that provides accura
 
 ## Features
 
-- Displays start and end times for Fajr, Dhuhr, Asr, Maghrib, and Isha prayers.
-- Automatically detects your location to provide precise timings.
-- Highlights the current prayer time.
-- Shows full location information using OpenStreetMap's Nominatim API.
+- Live countdown to the next prayer, with a progress bar for the current one.
+- Times for Fajr, Sunrise, Dhuhr (Jumuʿah on Fridays), Asr, Maghrib and Isha, with Arabic names.
+- Gregorian and Hijri dates.
+- Qibla direction and distance to Makkah.
+- Night times: Imsak, Islamic midnight and the last third of the night.
+- Settings: calculation method (or automatic), Standard or Hanafi Asr, 12/24-hour clock.
+- Automatic location, or search for a city manually.
+- Remembers your last location and today's times, so the popup opens instantly.
+- Light and dark themes that follow your system.
 
 ## Installation
 

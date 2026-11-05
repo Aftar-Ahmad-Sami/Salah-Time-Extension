@@ -18,7 +18,7 @@ The Salah Time Extension does not share your personal data with any third partie
 - **OpenStreetMap Nominatim API**: For reverse geocoding to retrieve location details.
 
 ## Data Storage
-The Salah Time Extension does not store any personal data. All data is processed locally on your device and is only used temporarily during the extension's operation.
+The Salah Time Extension saves your settings, your last known location (or the city you entered) and today's prayer times in your browser's local storage on your device, so the popup can open quickly. This data never leaves your device except as described above, and is deleted when you uninstall the extension.
 
 ## Permissions
 The extension requires the following permissions:
@@ -34,4 +34,4 @@ This privacy policy may be updated from time to time. Any changes will be reflec
 
 ---
 
-**Last Updated:** 3 May 2025
+**Last Updated:** 4 November 2026
