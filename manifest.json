@@ -4,6 +4,15 @@
     "version": "1.0.0",
     "description": "Displays Muslim prayer (Salah) times",
     "permissions": ["geolocation"],
+    "browser_specific_settings": {
+      "gecko": {
+        "id": "salah-time@aftar-ahmad-sami",
+        "strict_min_version": "140.0",
+        "data_collection_permissions": {
+          "required": ["locationInfo"]
+        }
+      }
+    },
     "action": {
       "default_popup": "src/html/popup.html",
       "default_icon": {

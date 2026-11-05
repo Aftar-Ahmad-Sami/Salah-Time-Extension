@@ -15,10 +15,20 @@ The **Salah Times Extension** is a simple yet powerful tool that provides accura
 
 ## Installation
 
+### Chrome / Chromium-based browsers
+
 1. Clone or download this repository to your local machine.
 2. Open Chrome (or another Chromium-based browser) and navigate to `chrome://extensions/`.
 3. Enable "Developer mode" in the top right corner.
 4. Click "Load unpacked" and select the directory where you downloaded/cloned this repository.
+
+### Firefox (140 or newer)
+
+1. Clone or download this repository to your local machine.
+2. Open Firefox and navigate to `about:debugging#/runtime/this-firefox`.
+3. Click "Load Temporary Add-on..." and select the `manifest.json` file in this repository.
+
+Temporary add-ons are removed when Firefox restarts. For a permanent install, the extension must be signed through [addons.mozilla.org](https://addons.mozilla.org/developers/).
 
 ## Usage
 
