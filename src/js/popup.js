@@ -78,6 +78,7 @@ const state = {
   settings: { ...DEFAULT_SETTINGS },
   location: null,
   data: null,        // AlAdhan "data" object for today
+  timeZone: null,    // IANA time zone of the location being shown
   dayKey: null,
   currentKey: null,
   loading: false,
@@ -119,6 +120,36 @@ const pad = (n) => String(n).padStart(2, '0');
 
 function dateKey(date) {
   return `${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()}`;
+}
+
+/**
+ * Returns a Date whose local fields (hours, day, ...) show the current wall-clock
+ * time in `timeZone`, so prayer times for any city can be compared against it.
+ */
+function zonedNow(timeZone) {
+  if (!timeZone) return new Date();
+  try {
+    const parts = {};
+    new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+    }).formatToParts(new Date()).forEach((part) => {
+      parts[part.type] = Number(part.value);
+    });
+    return new Date(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
+  } catch {
+    return new Date();
+  }
+}
+
+function locationNow() {
+  return zonedNow(state.timeZone);
 }
 
 function addDays(date, days) {
@@ -172,7 +203,16 @@ function prayerLabel(prayer, date) {
 }
 
 function iconSvg(name) {
-  return `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`;
+  const markup = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`;
+  const parsed = new DOMParser().parseFromString(markup, 'image/svg+xml');
+  return document.importNode(parsed.documentElement, true);
+}
+
+function createEl(tag, className, text) {
+  const node = document.createElement(tag);
+  node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
 }
 
 const toRad = (deg) => (deg * Math.PI) / 180;
@@ -291,15 +331,41 @@ function timingsCacheKey(loc, date) {
   return [dateKey(date), loc.lat.toFixed(3), loc.lon.toFixed(3), method, school].join('|');
 }
 
+function persistLocation(loc) {
+  if (state.settings.manual === loc) {
+    saveSettings();
+  } else if (!state.settings.manual) {
+    store.set(STORAGE_KEYS.location, loc);
+  }
+}
+
+/** Gets today's times for `loc`, where "today" is the date at that location. */
 async function getTimings(loc) {
-  const today = new Date();
-  const key = timingsCacheKey(loc, today);
+  const firstGuess = zonedNow(loc.timezone);
+  let data = await fetchTimingsForDate(loc, firstGuess);
+
+  const timezone = data.meta && data.meta.timezone;
+  if (timezone && loc.timezone !== timezone) {
+    loc.timezone = timezone;
+    persistLocation(loc);
+  }
+
+  // The first request used the device's date, and the city may already be on another day.
+  const localToday = zonedNow(timezone);
+  if (dateKey(localToday) !== dateKey(firstGuess)) {
+    data = await fetchTimingsForDate(loc, localToday);
+  }
+  return data;
+}
+
+async function fetchTimingsForDate(loc, date) {
+  const key = timingsCacheKey(loc, date);
   const cached = store.get(STORAGE_KEYS.timings);
   if (cached && cached.key === key && cached.data) return cached.data;
 
   showSkeleton();
   const { method, school } = state.settings;
-  let url = `https://api.aladhan.com/v1/timings/${dateKey(today)}?latitude=${loc.lat}&longitude=${loc.lon}&school=${school}`;
+  let url = `https://api.aladhan.com/v1/timings/${dateKey(date)}?latitude=${loc.lat}&longitude=${loc.lon}&school=${school}`;
   if (method !== '') url += `&method=${method}`;
 
   let json;
@@ -371,7 +437,8 @@ async function showForLocation(loc) {
 
 function applyData(data) {
   state.data = data;
-  state.dayKey = dateKey(new Date());
+  state.timeZone = (data.meta && data.meta.timezone) || null;
+  state.dayKey = dateKey(locationNow());
   state.currentKey = null;
   hideStatus();
   renderDates(data.date);
@@ -412,7 +479,7 @@ function computeSchedule(now) {
 }
 
 function renderDates(date) {
-  const now = new Date();
+  const now = locationNow();
   setText('gregorianDate', now.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' }));
   const h = date && date.hijri;
   if (h) {
@@ -424,37 +491,49 @@ function renderDates(date) {
 }
 
 function renderList() {
-  const now = new Date();
+  const now = locationNow();
   const timings = state.data.timings;
-  $('prayerList').innerHTML = PRAYERS.map((p) => {
+  $('prayerList').replaceChildren(...PRAYERS.map((p) => {
     const label = prayerLabel(p, now);
-    return `
-      <li class="prayer${p.minor ? ' is-minor' : ''}" data-key="${p.key}">
-        <span class="p-icon">${iconSvg(p.icon)}</span>
-        <span class="p-names">
-          <span class="p-name">${label.name}</span>
-          <span class="p-ar ar" lang="ar">${label.ar}</span>
-        </span>
-        <span class="p-meta">
-          <span class="p-time">${formatTime(parseTime(timings[p.key], now))}</span>
-          <span class="p-ends"></span>
-        </span>
-        <span class="p-progress"><span class="p-bar"></span></span>
-      </li>`;
-  }).join('');
+    const row = createEl('li', p.minor ? 'prayer is-minor' : 'prayer');
+    row.dataset.key = p.key;
+
+    const icon = createEl('span', 'p-icon');
+    icon.append(iconSvg(p.icon));
+
+    const names = createEl('span', 'p-names');
+    const arabic = createEl('span', 'p-ar ar', label.ar);
+    arabic.lang = 'ar';
+    names.append(createEl('span', 'p-name', label.name), arabic);
+
+    const meta = createEl('span', 'p-meta');
+    meta.append(
+      createEl('span', 'p-time', formatTime(parseTime(timings[p.key], now))),
+      createEl('span', 'p-ends')
+    );
+
+    const progress = createEl('span', 'p-progress');
+    progress.append(createEl('span', 'p-bar'));
+
+    row.append(icon, names, meta, progress);
+    return row;
+  }));
 }
 
 function showSkeleton() {
-  $('prayerList').innerHTML = PRAYERS.map(() => `
-    <li class="prayer is-skeleton">
-      <span class="p-icon"></span>
-      <span class="p-names"><span class="p-name">&nbsp;</span></span>
-      <span class="p-meta"><span class="p-time">&nbsp;</span></span>
-    </li>`).join('');
+  $('prayerList').replaceChildren(...PRAYERS.map(() => {
+    const row = createEl('li', 'prayer is-skeleton');
+    const names = createEl('span', 'p-names');
+    names.append(createEl('span', 'p-name', ' '));
+    const meta = createEl('span', 'p-meta');
+    meta.append(createEl('span', 'p-time', ' '));
+    row.append(createEl('span', 'p-icon'), names, meta);
+    return row;
+  }));
 }
 
 function renderNight(timings) {
-  const now = new Date();
+  const now = locationNow();
   setText('imsakTime', formatTime(parseTime(timings.Imsak, now)));
   // Midnight and the last third usually fall after 00:00, i.e. tomorrow's date, but the clock time is what matters.
   setText('midnightTime', formatTime(parseTime(timings.Midnight, now)));
@@ -472,7 +551,7 @@ function renderQibla(loc) {
 
 function tick() {
   if (!state.data) return;
-  const now = new Date();
+  const now = locationNow();
 
   // The day rolled over while the popup was open: load the new day's times.
   if (dateKey(now) !== state.dayKey) {
@@ -521,7 +600,7 @@ function hideStatus() {
 function showError(err) {
   console.error(err);
   if (!state.data) {
-    $('prayerList').innerHTML = '';
+    $('prayerList').replaceChildren();
     setText('countdown', '--:--:--');
   }
   if (!state.location) setText('locationName', 'Location unknown');
@@ -547,7 +626,7 @@ function saveSettings() {
 
 function renderSettingsForm() {
   const select = $('methodSelect');
-  select.innerHTML = '';
+  select.replaceChildren();
   METHODS.forEach(([value, label]) => {
     const opt = document.createElement('option');
     opt.value = value;

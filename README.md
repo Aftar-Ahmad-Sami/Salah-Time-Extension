@@ -1,63 +1,77 @@
-# Salah Times Extension
+<p align="center">
+  <img src="icons/icon-128.png" alt="Salah Time icon" width="128" height="128">
+</p>
 
-![Extension Icon](https://raw.githubusercontent.com/Aftar-Ahmad-Sami/Salah-Time-Extension/refs/heads/main/icons/icons8-mosque-flat-96.png)
+<h1 align="center">Salah Time</h1>
 
-## Overview
+<p align="center">
+  A browser extension for Chrome and Firefox that shows today's Muslim prayer times in one click, with a live countdown to the next prayer.
+</p>
 
-The **Salah Times Extension** is a simple yet powerful tool that provides accurate prayer times based on your current location. With just one click, you can view the start and end times of each prayer along with your full location details.
+![Salah Time showing today's prayer times, the Hijri date and the Qibla direction](screenshots/store/promo-marquee-1400x560.png)
+
+## Screenshots
+
+| Light theme | Dark theme | Settings |
+| :---: | :---: | :---: |
+| ![Prayer times in the light theme](screenshots/popup-light.png) | ![Prayer times in the dark theme](screenshots/popup-dark.png) | ![Settings panel](screenshots/popup-settings-light.png) |
 
 ## Features
 
-- Live countdown to the next prayer, with a progress bar for the current one.
-- Times for Fajr, Sunrise, Dhuhr (Jumuʿah on Fridays), Asr, Maghrib and Isha, with Arabic names.
-- Gregorian and Hijri dates.
-- Qibla direction and distance to Makkah.
-- Night times: Imsak, Islamic midnight and the last third of the night.
-- Settings: calculation method (or automatic), Standard or Hanafi Asr, 12/24-hour clock.
-- Automatic location, or search for a city manually.
-- Remembers your last location and today's times, so the popup opens instantly.
-- Light and dark themes that follow your system.
+- **Live countdown** to the next prayer, with a progress bar for the current one.
+- **Today's times** for Fajr, Sunrise, Dhuhr (Jumuʿah on Fridays), Asr, Maghrib and Isha, with Arabic names.
+- **Gregorian and Hijri dates.**
+- **Qibla direction** and distance to Makkah.
+- **Night times:** Imsak, Islamic midnight and the last third of the night.
+- **Your location or any city:** detect your location automatically, or search for a city. Times and the countdown follow that city's own clock.
+- **Settings:** 23 calculation methods or automatic selection, Standard or Hanafi Asr, and a 12-hour or 24-hour clock.
+- **Opens instantly:** your last location and today's times are saved in your browser.
+- **Light and dark themes** that follow your system.
 
-## Installation
+## Install from source
 
-### Chrome / Chromium-based browsers
+Clone or download this repository, then follow the steps for your browser.
 
-1. Clone or download this repository to your local machine.
-2. Open Chrome (or another Chromium-based browser) and navigate to `chrome://extensions/`.
-3. Enable "Developer mode" in the top right corner.
-4. Click "Load unpacked" and select the directory where you downloaded/cloned this repository.
+### Chrome and other Chromium browsers
 
-### Firefox (140 or newer)
+1. Open `chrome://extensions/`.
+2. Turn on **Developer mode** in the top right corner.
+3. Click **Load unpacked** and select this repository's folder.
 
-1. Clone or download this repository to your local machine.
-2. Open Firefox and navigate to `about:debugging#/runtime/this-firefox`.
-3. Click "Load Temporary Add-on..." and select the `manifest.json` file in this repository.
+### Firefox 142 or newer
 
-Temporary add-ons are removed when Firefox restarts. For a permanent install, the extension must be signed through [addons.mozilla.org](https://addons.mozilla.org/developers/).
+1. Open `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on...** and select `manifest.json` in this repository.
+
+Temporary add-ons are removed when Firefox restarts.
 
 ## Usage
 
-1. Once installed, you'll see an icon in your browser toolbar.
-2. Click on the icon to open the popup displaying prayer times and location information.
+1. Click the Salah Time icon in your browser toolbar. You may need to pin it first.
+2. Allow location access when asked, or open Settings and search for your city.
 
-## Technologies Used
+## Privacy
 
-- **JavaScript**: For fetching data from APIs and updating UI elements dynamically.
-- **HTML/CSS**: To create a clean user interface within the extension popup.
-- **AlAdhan API**: Provides accurate Islamic prayer timings based on geographical coordinates.
-- **OpenStreetMap Nominatim API**: Retrieves detailed address information from latitude/longitude coordinates.
+Salah Time has no account or ads. Your settings, last location and today's times are saved in your browser. To provide prayer times and place names, your location is sent to AlAdhan and OpenStreetMap Nominatim. Read the full [privacy policy](PRIVACY_POLICY.md).
+
+## Built with
+
+- HTML, CSS and JavaScript, with no build step
+- [AlAdhan API](https://aladhan.com/prayer-times-api) for prayer times and Hijri dates
+- [OpenStreetMap Nominatim](https://nominatim.org/) for place names and city search
 
 ## Contributing
 
-Contributions are welcome! If you'd like to contribute code or suggest improvements:
-1. Fork this repository
-2. Create a new branch (`git checkout -b feature/YourFeature`)
-3. Commit your changes (`git commit -m 'Add some feature'`)
-4. Push to the branch (`git push origin feature/YourFeature`)
-5. Open a pull request
+Contributions are welcome:
 
-Please ensure all contributions adhere to existing coding styles and include appropriate documentation/comments where necessary.
+1. Fork this repository.
+2. Create a branch: `git checkout -b feature/YourFeature`.
+3. Commit your changes: `git commit -m "Add some feature"`.
+4. Push the branch: `git push origin feature/YourFeature`.
+5. Open a pull request.
+
+Please follow the existing code style and add comments where they help.
 
 ## License
 
-This project is licensed under [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
